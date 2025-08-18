@@ -1,4 +1,4 @@
 {
   "comment": "Este arquivo aponta para o servidor FLUXON ativo.",
-  "bridge_service_url": "https://<URL_DO_SEU_NGROK_AQUI>/api/get_bridge_info"
+  "bridge_service_url": "https://b15ec9eb020e.ngrok-free.app/api/get_bridge_info"
 }
