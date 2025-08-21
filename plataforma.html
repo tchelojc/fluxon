@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALMA - Acesso</title>
+  <style>
+    /* SEU CSS CONTINUA EXATAMENTE O MESMO AQUI */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      height: 100vh;
+      background: url('https://images.unsplash.com/photo-1639762681057-408e52192e55?q=80&w=2232&auto=format&fit=crop') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    
+    .alma-button {
+      width: 200px;
+      height: 200px;
+      background: rgba(74, 111, 165, 0.5);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 
+        0 0 30px rgba(255, 255, 255, 0.2),
+        inset 0 0 30px rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      transition: all 0.4s ease;
+      animation: pulse 3s infinite;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+    
+    .alma-button::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 60%);
+      opacity: 0;
+      transform: rotate(45deg);
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+    
+    .alma-button:hover {
+      transform: scale(1.15);
+      background: rgba(74, 111, 165, 0.6);
+      box-shadow: 
+        0 0 50px rgba(255, 255, 255, 0.3),
+        inset 0 0 40px rgba(255, 255, 255, 0.2);
+      animation: none;
+    }
+    
+    .alma-button:hover::before {
+      opacity: 0.3;
+    }
+    
+    .alma-button:active {
+      transform: scale(0.95);
+      background: rgba(74, 111, 165, 0.7);
+    }
+    
+    @keyframes pulse {
+      0% {
+        box-shadow: 
+          0 0 20px rgba(255, 255, 255, 0.2),
+          inset 0 0 20px rgba(255, 255, 255, 0.1);
+      }
+      50% {
+        box-shadow: 
+          0 0 40px rgba(255, 255, 255, 0.3),
+          inset 0 0 30px rgba(255, 255, 255, 0.15);
+      }
+      100% {
+        box-shadow: 
+          0 0 20px rgba(255, 255, 255, 0.2),
+          inset 0 0 20px rgba(255, 255, 255, 0.1);
+      }
+    }
+    
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      animation: float 8s infinite ease-in-out;
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-120px) rotate(360deg);
+      }
+    }
+    
+    .loading-text {
+      position: absolute;
+      bottom: 30px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+      text-align: center;
+      width: 100%;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: fade 3s infinite;
+    }
+    
+    .connection-status {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8rem;
+    }
+    
+    @keyframes fade {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+    
+    @media (max-width: 768px) {
+      .alma-button {
+        width: 170px;
+        height: 170px;
+        font-size: 2.2rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .alma-button {
+        width: 140px;
+        height: 140px;
+        font-size: 2rem;
+      }
+      
+      .loading-text {
+        font-size: 0.8rem;
+        bottom: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+  
+  <a href="#" class="alma-button" id="alma-btn">
+    ALMA
+  </a>
+  
+  <div class="loading-text" id="loading-text">Clique para acessar</div>
+  
+  <div class="connection-status" id="connection-status"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const almaButton = document.getElementById('alma-btn');
+    const loadingText = document.getElementById('loading-text');
+    const connectionStatus = document.getElementById('connection-status');
+
+    // URLs de acesso (prioridade: IP Local > Ngrok Fallback via GitHub > GitHub Pages)
+    // ESTA É A PARTE PRINCIPAL QUE FOI ALTERADA
+    const accessUrls = [
+      'http://192.168.99.170:5500/plataforma.html',      // 1. Tenta o IP estático local (acesso na mesma rede)
+      'https://tchelojc.github.io/fluxon/plataforma.html' // 2. Fallback para a versão no GitHub Pages (que encontrará o Ngrok dinâmico)
+    ];
+
+    // Nomes para exibição
+    const accessNames = [
+      'Rede Local (IP Fixo)',
+      'Servidor Externo (via GitHub/Ngrok)'
+    ];
+
+    // Função para testar qual URL está acessível
+    async function testConnection(url) {
+      try {
+        // Usamos 'HEAD' para uma verificação rápida sem baixar o conteúdo
+        const response = await fetch(url, { 
+          method: 'HEAD',
+          mode: 'no-cors', // 'no-cors' é essencial para testes de disponibilidade cross-origin
+          cache: 'no-cache',
+          signal: AbortSignal.timeout(3000) // Timeout de 3 segundos
+        });
+        // 'no-cors' resulta em uma resposta 'opaque', que não podemos ler o status
+        // mas o fato de não ter gerado um erro de rede já indica que o host está acessível.
+        return true;
+      } catch (error) {
+        console.warn(`Conexão com ${url} falhou:`, error.name);
+        return false;
+      }
+    }
+
+    // Encontrar a melhor conexão disponível
+    async function findBestConnection() {
+      loadingText.textContent = "Verificando servidores...";
+      
+      for (let i = 0; i < accessUrls.length; i++) {
+        connectionStatus.textContent = `Testando: ${accessNames[i]}...`;
+        const isAvailable = await testConnection(accessUrls[i]);
+        if (isAvailable) {
+          almaButton.href = accessUrls[i];
+          connectionStatus.textContent = `Conectado via: ${accessNames[i]}`;
+          loadingText.textContent = "Pronto para acessar";
+          console.log(`✅ Conexão estabelecida com: ${accessUrls[i]}`);
+          return;
+        }
+      }
+      
+      // Se nenhuma conexão estiver disponível
+      connectionStatus.textContent = "Todos os servidores estão offline.";
+      loadingText.textContent = "Sistema indisponível. Tente mais tarde.";
+      almaButton.style.opacity = "0.5";
+      almaButton.style.pointerEvents = "none";
+    }
+
+    // Configurar o botão
+    almaButton.addEventListener('click', (e) => {
+      if (!almaButton.href || almaButton.href === '#' || almaButton.style.pointerEvents === 'none') {
+        e.preventDefault();
+        return;
+      }
+      loadingText.textContent = "Redirecionando...";
+      almaButton.style.pointerEvents = 'none';
+    });
+
+    // Função para criar as partículas visuais (sem alteração)
+    function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 25; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.width = `${Math.random() * 4 + 1}px`;
+        p.style.height = p.style.width;
+        p.style.left = `${Math.random() * 100}%`;
+        p.style.top = `${Math.random() * 100 + 50}%`;
+        p.style.animationDelay = `${Math.random() * 7}s`;
+        p.style.animationDuration = `${8 + Math.random() * 8}s`;
+        container.appendChild(p);
+      }
+    }
+
+    // Inicializar
+    createParticles();
+    findBestConnection();
+  });
+</script>
+</body>
+</html>
